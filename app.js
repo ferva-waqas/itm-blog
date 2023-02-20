@@ -44,6 +44,7 @@ app.set('view engine', 'ejs');
 app.set('views', 'views');
 
 const authRoutes = require('./routes/auth');
+const commentRoutes = require('./routes/commentRoutes');
 app.use(passport.initialize());
 require("./config/passport")(passport);
 
@@ -67,6 +68,7 @@ app.use(
 );
 
 app.use('/api/v1',authRoutes);
+app.use('/api/v1',commentRoutes);
 
 app.post('/post/:id/comment', async (req, res) => {
   // find out which post you are commenting
