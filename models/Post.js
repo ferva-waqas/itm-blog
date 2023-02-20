@@ -11,17 +11,14 @@ const mongoose = require('mongoose');
              trim: true,
              required: true
            },
-           date: {
-             type: Date,
-             default: Date.now
-            },
+           
          // a blog post can have multiple comments, so it should be in a array.
          // all comments info should be kept in this array of this blog post.
           comments: [{
              type: mongoose.Schema.Types.ObjectId,
              ref: 'Comment'
            }]
-           })
+           }, { timestamps: true })
 
            postSchema.virtual('url').get(function(){
               return '/post/' + this._id

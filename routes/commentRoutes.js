@@ -1,11 +1,7 @@
 const express = require('express');
-const authController = require('../controllers/comment');
+const commentController = require('../controllers/comment');
 const router = express.Router();
 
-
-
-router.post('/:user_id/create', authController.create);
-
-
+router.post('/post/:id/comment', commentController.create);
 
 module.exports = router;

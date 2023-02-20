@@ -6,15 +6,11 @@ const mongoose = require('mongoose');
               trim: true,
               required: true
            },
-        date: {
-              type: Date,
-              default: Date.now
-           },
        // each comment can only relates to one blog, so it's not in array
         post: {
               type: mongoose.Schema.Types.ObjectId,
               ref: 'Post'
            }
-         })
+         }, { timestamps: true })
 
         module.exports = mongoose.model('Comment', commentSchema);
