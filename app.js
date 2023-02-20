@@ -29,8 +29,8 @@ const fileFilter = (req, file, cb) => {
     cb(null, false);
   }
 };
-
-const User = require('./models/User');
+const Posts = require('./models/Post')
+const Comment = require('./models/Comments');
 
 const MONGODB_URI = `${config.DATABASE_URL}:${config.DATABASE_PORT}/${config.DATA_BASENAME}`;
 
@@ -67,6 +67,54 @@ app.use(
 );
 
 app.use('/api/v1',authRoutes);
+
+app.post('/post/:id/comment', async (req, res) => {
+  // find out which post you are commenting
+  
+  const id = req.params.id;
+  // get the comment text and record post id
+  const blogPost =  await Posts.find({});
+
+  console.log(blogPost);
+  
+  const comment = new Comment({
+   text: req.body.comment,
+   post: id
+})
+  // save comment
+await comment.save();
+  // get this particular post
+const postRelated = await blogPost[0];
+  // push the comment into the post.comments array
+postRelated.comments.push(comment);
+  // save and redirect...
+await postRelated.save(function(err) {
+if(err) {console.log(err)}
+res.status(200)
+})
+
+})
+
+app.post('/post/:id', async (req, res) => {
+  // find out which post you are commenting
+   const id = req.params.id;
+  // get the comment text and record post id
+   const blogPost = new Posts({
+   title: req.body.title,
+    text: req.body.text
+})
+  // save comment
+await blogPost.save();
+  // get this particular post
+//const postRelated = await Post.findById(id);
+  // push the comment into the post.comments array
+//postRelated.comments.push(comment);
+  // save and redirect...
+//await postRelated.save(function(err) {
+//if(err) {console.log(err)}
+//res.redirect('/')
+})
+
 
 
 mongoose

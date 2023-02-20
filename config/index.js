@@ -1,6 +1,6 @@
 module.exports.emailSecrets = {
-    USER: "672cb547cfff50",
-    PASS: "ce27afaee85286"
+    USER: "2f09f69f246205",
+    PASS: "eec6207b0ac44d"
 }
 
 module.exports.config = {
@@ -12,4 +12,3 @@ module.exports.config = {
     SERVER_PORT: 4200,
     SERVER_KEY: 'itm_&&_class_morning_secret##'
 }
-
