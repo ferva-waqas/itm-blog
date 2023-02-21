@@ -2,13 +2,13 @@ const Comment = require("../models/Comments");
 const Posts = require("../models/Post");
 
 module.exports = {
-  create: async function (req, res) {
+  create: function (req, res) {
     // find out which post you are commenting
 
-    const id = req.params.id;
+    const postId = req.params.postId;
     // get the comment text and record post id
-    const blogPost = await Posts.findById(id);
-    Posts.findById(id, async function (err, blogPost) {
+    Posts.findById(postId, async function (err, blogPost) {
+      console.log(blogPost);
       if (err) {
         return res.status(400).json({
           success: false,
@@ -17,7 +17,7 @@ module.exports = {
       } else {
         const comment = new Comment({
           text: req.body.comment,
-          post: id,
+          post: postId,
         });
         // save comment
         await comment.save();
@@ -41,5 +41,66 @@ module.exports = {
         });
       }
     });
+  },
+
+  deleteComment: function (req, res) {
+    const commentId = req.body.commentId;
+
+    Comment.findByIdAndDelete(commentId, function (err) {
+      if (err) {
+        return res.status(400).json({
+          success: false,
+          error: err,
+        });
+      } else {
+        return res.status(202).json({
+          success: true,
+          message: "comment deleted",
+        });
+      }
+    });
+  },
+
+  updateComment: function (req, res) {
+    const commentId = req.body.commentId;
+
+    const newComment = req.body.comment;
+
+    Comment.findByIdAndUpdate(
+      commentId,
+      { text: newComment },
+      function (err, comment) {
+        if (err) {
+          return res.status(400).json({
+            success: false,
+            error: err,
+          });
+        } else {
+          return res.status(202).json({
+            success: true,
+            data: {
+              updatedComment: comment,
+            },
+          });
+        }
+      }
+    );
+  },
+
+  showComments: async function (req, res) {
+    try {
+      const allComments = await Comment.find({});
+      return res.status(202).json({
+        success: true,
+        data: {
+          allComments: allComments,
+        },
+      });
+    } catch (err) {
+      return res.status(400).json({
+        success: false,
+        error: err,
+      });
+    }
   },
 };
