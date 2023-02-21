@@ -20,8 +20,8 @@ const mongoose = require('mongoose');
            }]
            }, { timestamps: true })
 
-           postSchema.virtual('url').get(function(){
-              return '/post/' + this._id
-           })
+          //  postSchema.virtual('url').get(function(){
+          //     return '/post/' + this._id
+          //  })
 
          module.exports = mongoose.model('Post', postSchema);

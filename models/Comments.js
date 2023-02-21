@@ -7,7 +7,7 @@ const mongoose = require('mongoose');
               required: true
            },
        // each comment can only relates to one blog, so it's not in array
-        post: {
+        post_id: {
               type: mongoose.Schema.Types.ObjectId,
               ref: 'Post'
            }
