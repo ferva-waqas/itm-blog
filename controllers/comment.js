@@ -116,85 +116,67 @@ module.exports = {
 
     },
 
-    updateComment: function(req,res){
 
-        res.send("good");
+
+    updateComment: async function (req, res) {
+        const commentId = req.params.comment_id;
+        const postId = req.params.post_id;
+        const userId = req.params.user_id;
+        const update = req.body.text;
+        console.log(commentId + " " + postId + " " + userId + " " + update);
+
+        if (mongoose.Types.ObjectId.isValid(commentId) &&
+            mongoose.Types.ObjectId.isValid(postId) &&
+            mongoose.Types.ObjectId.isValid(userId)) {
+            const userData = await Users.findById(userId);
+            if (userData) {
+
+                const postData = await Posts.findById(postId);
+                if (postData) {
+
+                    // both user and post exist, update comment here
+                     //const updatedComment = await Comment.findByIdAndUpdate(commentId, req.body.text, { new: true });
+
+                     const updatedComment = await Comment.findOneAndUpdate(
+                      { _id: commentId },
+                      { text: req.body.text },
+                      { new: true }
+                  );
+                    console.log(updatedComment)
+                    if (updatedComment == null) {
+
+                        return res.status(404).json({
+                            success: false,
+                            message: 'Comment not found',
+                        });
+                    } else {
+
+                        return res.status(200).json({
+                            success: true,
+                            message: 'Comment updated',
+                            updatedComment: updatedComment,
+                        });
+                    }
+
+                } else {
+                    return res.status(404).json({
+                        success: false,
+                        message: 'Post not found',
+                    });
+                }
+            } else {
+                return res.status(404).json({
+                    success: false,
+                    message: 'User not found',
+                });
+            }
+        }
+        else {
+            return res.status(400).json({
+                success: false,
+                message: 'Invalid comment ID ,user ID or post ID',
+            });
+        }
     }
 
-}
-
-//     updateComment: async function (req, res) {
-//         const commentId = req.params.comment_id;
-//         const postId = req.params.post_id;
-//         const userId = req.params.user_id;
-//         const update = req.body.text;
-//         console.log(commentId + " " + postId + " " + userId + " " + update);
-
-//         if (mongoose.Types.ObjectId.isValid(commentId) &&
-//             mongoose.Types.ObjectId.isValid(postId) &&
-//             mongoose.Types.ObjectId.isValid(userId)) {
-//             const userData = await Users.findById(userId);
-//             if (userData) {
-
-//                 const postData = await Posts.findById(postId);
-//                 if (postData) {
-
-//                     // both user and post exist, update comment here
-//                     const updatedComment = await Comment.findByIdAndUpdate(commentId, req.body, { new: true });
-
-//                     if (updatedComment == null) {
-
-//                         return res.status(404).json({
-//                             success: false,
-//                             message: 'Comment not found',
-//                         });
-//                     } else {
-
-//                         return res.status(200).json({
-//                             success: true,
-//                             message: 'Comment updated',
-//                             updatedComment: updatedComment,
-//                         });
-//                     }
-
-//                 } else {
-//                     return res.status(404).json({
-//                         success: false,
-//                         message: 'Post not found',
-//                     });
-//                 }
-//             } else {
-//                 return res.status(404).json({
-//                     success: false,
-//                     message: 'User not found',
-//                 });
-//             }
-//         }
-//         else {
-//             return res.status(400).json({
-//                 success: false,
-//                 message: 'Invalid comment ID ,user ID or post ID',
-//             });
-//         }
-//     }
-
-// };
-
-
-    // showComments: async function (req, res) {
-    //     try {
-    //         const allComments = await Comment.find({});
-    //         return res.status(202).json({
-    //             success: true,
-    //             data: {
-    //                 allComments: allComments,
-    //             },
-    //         });
-    //     } catch (err) {
-    //         return res.status(400).json({
-    //             success: false,
-    //             error: err,
-    //         });
-    //     }
-    // },
-
+};

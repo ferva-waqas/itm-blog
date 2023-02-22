@@ -72,13 +72,11 @@ app.use(
 app.use('/api/v1',authRoutes);
 app.use('/api/v1',commentRoutes);
 app.use('/api/v1',postRoutes);
-app.use('/update',function(req,res){
-  res.send('good');
-})
+
 
 
 mongoose
-.connect(MONGODB_URI)
+.connect(MONGODB_URI, { useFindAndModify: false })
 .then(result => {
     app.listen(config.SERVER_PORT);
   })
