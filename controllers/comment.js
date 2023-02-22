@@ -1,141 +1,200 @@
+const mongoose = require('mongoose');
 const Comment = require("../models/Comments");
 const Posts = require("../models/Post");
+var Users = require('../models/User');
 
 module.exports = {
-  create: function (req, res) {
-    // find out which post you are commenting
+    create: async function (req, res) {
+        // staffByRight: async(req,res) =>{
+        //     const rightData = await Right.find(  { _id : req.body.right_id}  ).populate('staff_id');
+        //     res.send(rightData) ;
+        // }
+        const postId = req.params.post_id;
+        const userId = req.params.user_id;
 
-<<<<<<< HEAD
-    create: async function (req, res){
-    
+        // const userdata = await Posts.find({userId},).populate('user_id');
+        //     console.log(userdata);
+        //     res.send(userdata);
         // find out which post you are commenting
-        
-        const id = req.params.id;
-        console.log(id);
-        // get the comment text and record post id
-        const blogPost =  await Posts.findById(id);
-      
-        console.log(blogPost);
-        
-        const comment = new Comment({
-         text: req.body.comment,
-         post_id: id
-      })
-=======
-    const postId = req.params.postId;
-    // get the comment text and record post id
-    Posts.findById(postId, async function (err, blogPost) {
-      console.log(blogPost);
-      if (err) {
-        return res.status(400).json({
-          success: false,
-          error: err,
+
+
+        // // get the comment text and record post id
+        Posts.findById(postId, async function (err, blogPost) {
+            console.log(blogPost);
+            if (err) {
+                return res.status(400).json({
+                    success: false,
+                    error: err,
+                });
+            } else {
+                const comment = new Comment({
+                    text: req.body.comment,
+                    post: postId,
+                    user: userId
+                });
+                // save comment
+                await comment.save();
+                // push the comment into the blogPost.comments array
+
+                blogPost.comments.push(comment);
+
+                // save and send status
+
+                await blogPost.save(function (err) {
+                    if (err) {
+                        console.log(err);
+                    }
+                });
+                return res.status(202).json({
+                    success: true,
+                    data: {
+                        comment: comment,
+                        blogPost: blogPost,
+                    },
+                });
+            }
         });
-      } else {
-        const comment = new Comment({
-          text: req.body.comment,
-          post: postId,
-        });
->>>>>>> 3c7bb51d34f183c395e75de998952a79ac63fee3
-        // save comment
-        await comment.save();
-        // push the comment into the blogPost.comments array
+    },
 
-<<<<<<< HEAD
-      await blogPost.save(function(err) {
-      if(err) {console.log(err)}
-      res.status(200).send("comment added")
-      })
-      
-      },
+    deleteComment: async function (req, res) {
 
+        const commentId = req.params.comment_id;
+        const postId = req.params.post_id;
+        const userId = req.params.user_id;
+        console.log(commentId + " " + postId + " " + userId);
 
-      // delete Controller
-      delete: function(req,res){
+        if (mongoose.Types.ObjectId.isValid(commentId) &&
+            mongoose.Types.ObjectId.isValid(postId) &&
+            mongoose.Types.ObjectId.isValid(userId)
+        ) {
+            const userData = await Users.findById(userId);
+            if (userData) {
 
-        const comment_id = req.params.comment_id;
-        console.log(comment_id);
-        res.send("good");
-=======
-        blogPost.comments.push(comment);
+                const postData = await Posts.findById(postId);
+                if (postData) {
 
-        // save and send status
+                    // both user and post exist, delete comment here
+                    const deletedComment = await Comment.findByIdAndDelete(commentId);
 
-        await blogPost.save(function (err) {
-          if (err) {
-            console.log(err);
-          }
-        });
-        return res.status(202).json({
-          success: true,
-          data: {
-            comment: comment,
-            blogPost: blogPost,
-          },
-        });
->>>>>>> 3c7bb51d34f183c395e75de998952a79ac63fee3
-      }
-    });
-  },
+                    if (deletedComment == null) {
 
-  deleteComment: function (req, res) {
-    const commentId = req.body.commentId;
+                        return res.status(202).json({
+                            success: false,
+                            message: 'Comment already deleted',
+                            deletedComment: deletedComment,
+                        });
+                    }
+                    else {
 
-    Comment.findByIdAndDelete(commentId, function (err) {
-      if (err) {
-        return res.status(400).json({
-          success: false,
-          error: err,
-        });
-      } else {
-        return res.status(202).json({
-          success: true,
-          message: "comment deleted",
-        });
-      }
-    });
-  },
+                        return res.status(202).json({
+                            success: true,
+                            message: 'Comment deleted',
+                            deletedComment: deletedComment,
+                        });
+                    }
 
-  updateComment: function (req, res) {
-    const commentId = req.body.commentId;
-
-    const newComment = req.body.comment;
-
-    Comment.findByIdAndUpdate(
-      commentId,
-      { text: newComment },
-      function (err, comment) {
-        if (err) {
-          return res.status(400).json({
-            success: false,
-            error: err,
-          });
-        } else {
-          return res.status(202).json({
-            success: true,
-            data: {
-              updatedComment: comment,
-            },
-          });
+                } else {
+                    return res.status(404).json({
+                        success: false,
+                        message: 'Post not found',
+                    });
+                }
+            } else {
+                return res.status(404).json({
+                    success: false,
+                    message: 'User not found',
+                });
+            }
         }
-      }
-    );
-  },
+        else {
+            return res.status(400).json({
+                success: false,
+                message: 'Invalid comment ID ,user ID or post ID',
+            });
+        }
 
-  showComments: async function (req, res) {
-    try {
-      const allComments = await Comment.find({});
-      return res.status(202).json({
-        success: true,
-        data: {
-          allComments: allComments,
-        },
-      });
-    } catch (err) {
-      return res.status(400).json({
-        success: false,
-        error: err,
-      });
+
+    },
+
+    updateComment: function(req,res){
+
+        res.send("good");
     }
-  },
-};
+
+}
+
+//     updateComment: async function (req, res) {
+//         const commentId = req.params.comment_id;
+//         const postId = req.params.post_id;
+//         const userId = req.params.user_id;
+//         const update = req.body.text;
+//         console.log(commentId + " " + postId + " " + userId + " " + update);
+
+//         if (mongoose.Types.ObjectId.isValid(commentId) &&
+//             mongoose.Types.ObjectId.isValid(postId) &&
+//             mongoose.Types.ObjectId.isValid(userId)) {
+//             const userData = await Users.findById(userId);
+//             if (userData) {
+
+//                 const postData = await Posts.findById(postId);
+//                 if (postData) {
+
+//                     // both user and post exist, update comment here
+//                     const updatedComment = await Comment.findByIdAndUpdate(commentId, req.body, { new: true });
+
+//                     if (updatedComment == null) {
+
+//                         return res.status(404).json({
+//                             success: false,
+//                             message: 'Comment not found',
+//                         });
+//                     } else {
+
+//                         return res.status(200).json({
+//                             success: true,
+//                             message: 'Comment updated',
+//                             updatedComment: updatedComment,
+//                         });
+//                     }
+
+//                 } else {
+//                     return res.status(404).json({
+//                         success: false,
+//                         message: 'Post not found',
+//                     });
+//                 }
+//             } else {
+//                 return res.status(404).json({
+//                     success: false,
+//                     message: 'User not found',
+//                 });
+//             }
+//         }
+//         else {
+//             return res.status(400).json({
+//                 success: false,
+//                 message: 'Invalid comment ID ,user ID or post ID',
+//             });
+//         }
+//     }
+
+// };
+
+
+    // showComments: async function (req, res) {
+    //     try {
+    //         const allComments = await Comment.find({});
+    //         return res.status(202).json({
+    //             success: true,
+    //             data: {
+    //                 allComments: allComments,
+    //             },
+    //         });
+    //     } catch (err) {
+    //         return res.status(400).json({
+    //             success: false,
+    //             error: err,
+    //         });
+    //     }
+    // },
+

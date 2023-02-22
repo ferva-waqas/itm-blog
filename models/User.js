@@ -22,7 +22,11 @@ const userSchema = new Schema({
   imageUrl: {
     type: String,
     required: false
-  }
+  },
+  post: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Post'
+  }]
 },
 { timestamps: true }
 );

@@ -6,6 +6,7 @@ const mongoose = require('mongoose');
               trim: true,
               required: true
            },
+      
        // each comment can only relates to one blog, so it's not in array
         post_id: {
               type: mongoose.Schema.Types.ObjectId,

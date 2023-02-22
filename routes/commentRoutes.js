@@ -2,18 +2,17 @@ const express = require('express');
 const commentController = require('../controllers/comment');
 const router = express.Router();
 
-<<<<<<< HEAD
-router.post('/post/:id/comment', commentController.create);
-router.delete('/post/:id/:comment_id/delete' , commentController.delete);
-=======
-router.post('/post/:postId/comment', commentController.create);
+router.post('/:user_id/:post_id/comment', commentController.create);
 
-router.post('/comment/delete', commentController.deleteComment);
 
-router.post('/comment/update', commentController.updateComment);
+router.get('/update',function(req, res){
+    res.send("good");
+});  // wants to run this basic function
 
-router.post('/comment/show', commentController.showComments);
+router.delete('/:user_id/:post_id/:comment_id/delete', commentController.deleteComment);
 
->>>>>>> 3c7bb51d34f183c395e75de998952a79ac63fee3
+
+// router.post('/comment/show', commentController.showComments);
+
 
 module.exports = router;
